@@ -22,6 +22,9 @@ public class Player : MonoBehaviour
     private bool jumpPressed;
     private float holdTime;
 
+    private bool isShootCharged = false;
+    private int shootCharge = 0;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -33,7 +36,7 @@ public class Player : MonoBehaviour
         moveX = Input.GetAxisRaw("Horizontal");
         if (Input.GetButtonDown("Jump")) { jumpPressed = true; }
 
-        if (Input.GetButtonDown("Fire1")) { Fire(); }
+        HandleShootPressing();
     }
 
     void FixedUpdate()
@@ -41,6 +44,7 @@ public class Player : MonoBehaviour
         CheckJump();
         ApplyGravity();
         MovePlayer();
+        CheckChargeShot();
     }
 
     void MovePlayer()
@@ -79,9 +83,23 @@ public class Player : MonoBehaviour
         if(moveX == 0f) { rb.velocity = new Vector2(0, rb.velocity.y); }
     }
 
-    void Fire()
+    void HandleShootPressing()
     {
-        GameObject projectile = Instantiate(shootPrefabs[0], shootSpawn.transform.position, Quaternion.identity);
+        if (Input.GetButtonDown("Fire1")) { Fire(shootCharge); }
+
+        if (Input.GetButtonUp("Fire1") && isShootCharged)
+        {
+            Fire(shootCharge);
+            holdTime = 0;
+            shootCharge = 0;
+            isShootCharged = false;
+        }
+        else if (Input.GetButtonUp("Fire1")) { holdTime = 0; }
+    }
+
+    void Fire(int shootIndex)
+    {
+        GameObject projectile = Instantiate(shootPrefabs[shootIndex], shootSpawn.transform.position, Quaternion.identity);
         projectile.GetComponent<Rigidbody2D>().velocity = new Vector2(shootSpawn.localPosition.x*2 * 7, 0); //PROVISÓRIO PELO AMOR DE DEUS MUDA ISSO
         //////////////////////////////////////////////////////////////////////////////////////////////////////QUANDO CHEGAR ANIMATOR AAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         Destroy(projectile, 3f);       
@@ -89,7 +107,11 @@ public class Player : MonoBehaviour
 
     void CheckChargeShot()
     {
+        if (Input.GetButton("Fire1")) { holdTime += Time.fixedDeltaTime; }
+        
 
+        if (holdTime > 1f && holdTime < 2 ) { shootCharge = 1; isShootCharged = true; print("carregou 1"); }
+        else if (holdTime >= 2f) { shootCharge = 2; print("carregou 2"); }
     }
 
 }
