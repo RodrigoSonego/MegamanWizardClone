@@ -9,6 +9,10 @@ public class Player : MonoBehaviour
     [SerializeField] private float speed;
     [SerializeField] private float jumpForce;
     [SerializeField] private float fallMultiplier;
+    [Space]
+    [SerializeField] private GameObject[] shootPrefabs;
+    [SerializeField] private Transform shootSpawn;
+    [Space]
     [SerializeField] private LayerMask platformLayers;
 
     private Rigidbody2D rb;
@@ -16,6 +20,7 @@ public class Player : MonoBehaviour
 
     private float moveX;
     private bool jumpPressed;
+    private float holdTime;
 
     void Start()
     {
@@ -27,6 +32,8 @@ public class Player : MonoBehaviour
     {
         moveX = Input.GetAxisRaw("Horizontal");
         if (Input.GetButtonDown("Jump")) { jumpPressed = true; }
+
+        if (Input.GetButtonDown("Fire1")) { Fire(); }
     }
 
     void FixedUpdate()
@@ -40,8 +47,9 @@ public class Player : MonoBehaviour
     {
         if (moveX != 0)
         {
-            //rb.MovePosition(rb.position + new Vector2(moveX ) * speed * Time.deltaTime);
             rb.velocity = new Vector2(speed * moveX, rb.velocity.y);
+
+            shootSpawn.localPosition = new Vector3(0.5f * moveX, 0, 0);
         }
     }
 
@@ -70,4 +78,18 @@ public class Player : MonoBehaviour
 
         if(moveX == 0f) { rb.velocity = new Vector2(0, rb.velocity.y); }
     }
+
+    void Fire()
+    {
+        GameObject projectile = Instantiate(shootPrefabs[0], shootSpawn.transform.position, Quaternion.identity);
+        projectile.GetComponent<Rigidbody2D>().velocity = new Vector2(shootSpawn.localPosition.x*2 * 7, 0); //PROVISÓRIO PELO AMOR DE DEUS MUDA ISSO
+        //////////////////////////////////////////////////////////////////////////////////////////////////////QUANDO CHEGAR ANIMATOR AAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        Destroy(projectile, 3f);       
+    }
+
+    void CheckChargeShot()
+    {
+
+    }
+
 }
