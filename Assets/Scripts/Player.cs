@@ -44,9 +44,9 @@ public class Player : MonoBehaviour
 
     void FixedUpdate()
     {
-        MovePlayer();
         CheckWallSlide();
         CheckJump();
+        MovePlayer();
         ApplyGravity();
      
         CheckChargeShot();
@@ -59,7 +59,7 @@ public class Player : MonoBehaviour
             float actualSpeed = speed;
             if(!IsGrounded()) { actualSpeed = speed / 1.3f; }
             rb.velocity = new Vector2(actualSpeed * moveX, rb.velocity.y);
-            directionFacing = (int)moveX;
+            if(!isWallSliding)directionFacing = (int)moveX;
 
             shootSpawn.localPosition = new Vector3(0.5f * moveX, 0, 0);
         }
@@ -71,7 +71,7 @@ public class Player : MonoBehaviour
         {
             Jump();
         } 
-        else if (jumpPressed && isWallSliding)
+        else if (jumpPressed && IsTouchingWall())
         {
             WallJump();
         }
@@ -86,7 +86,19 @@ public class Player : MonoBehaviour
     void WallJump()
     {
         isWallJumping = true;
-        rb.AddForce(new Vector2(-moveX * 10, jumpForce), ForceMode2D.Impulse);
+
+        if (isWallSliding)
+        {
+            rb.AddForce(new Vector2(-directionFacing * 5, jumpForce / 1.1f), ForceMode2D.Impulse);
+        } 
+        else
+        {
+            rb.AddForce(new Vector2(-directionFacing * 5, jumpForce / 1.1f), ForceMode2D.Impulse);
+            directionFacing = -directionFacing;
+        }
+       
+
+        
         jumpPressed = false;
         StartCoroutine(WallJumpCooldown());
     }
@@ -156,11 +168,16 @@ public class Player : MonoBehaviour
 
     bool IsTouchingWall()
     {
-        Vector2 boxCenter = rb.position + new Vector2(0.1f * directionFacing, 0f);
-        Collider2D col = Physics2D.OverlapBox(boxCenter,
+        Vector2 boxRight = rb.position + new Vector2(0.1f * directionFacing, 0f);
+        Collider2D col = Physics2D.OverlapBox(boxRight,
                                     playerCollider.bounds.size - new Vector3(0,0.3f,0), 0f, platformLayers);
 
-        return col != null;
+        Vector2 boxLeft = rb.position + new Vector2(0.1f * directionFacing, 0f);
+        Collider2D leftcol = Physics2D.OverlapBox(boxLeft,
+                                    playerCollider.bounds.size - new Vector3(0, 0.3f, 0), 0f, platformLayers);
+
+
+        return col != null || leftcol != null;
     }
 
     void CheckWallSlide()
