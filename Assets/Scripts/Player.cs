@@ -80,7 +80,6 @@ public class Player : MonoBehaviour
 
     void Jump()
     {
-        //rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
         rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         jumpPressed = false;
     }
@@ -91,13 +90,11 @@ public class Player : MonoBehaviour
 
         if (isWallSliding)
         {
-            //rb.AddForce(new Vector2(-directionFacing * 5, jumpForce / 1.1f), ForceMode2D.Impulse);
-            rb.velocity = new Vector2(-directionFacing * 5, jumpForce);
+            rb.velocity = new Vector2(-directionFacing * 4, jumpForce);
         } 
         else
         {
-            //rb.AddForce(new Vector2(-directionFacing * 5, jumpForce / 1.1f), ForceMode2D.Impulse);
-            rb.velocity = new Vector2(-directionFacing * 5, jumpForce);
+            rb.velocity = new Vector2(-directionFacing * 4, jumpForce);
             directionFacing = -directionFacing;
         }
        
@@ -142,10 +139,11 @@ public class Player : MonoBehaviour
 
     void HandleShootPressing()
     {
-        if (Input.GetButtonDown("Fire1")) { Fire(shootCharge); }
+        if (Input.GetButtonDown("Fire1")) { Fire(shootCharge); print("atirou"); }
 
         if (Input.GetButtonUp("Fire1") && isShootCharged)
         {
+            print("atirou carregado");
             Fire(shootCharge);
             holdTime = 0;
             shootCharge = 0;
@@ -165,7 +163,8 @@ public class Player : MonoBehaviour
 
     void CheckChargeShot()
     {
-        if (Input.GetButton("Fire1")) { holdTime += Time.fixedDeltaTime; }
+        if (Input.GetButton("Fire1") == false) { return; }
+        else { holdTime += Time.fixedDeltaTime; }
         
 
         if (holdTime > 1f && holdTime < 2 ) { shootCharge = 1; isShootCharged = true; print("carregou 1"); }
