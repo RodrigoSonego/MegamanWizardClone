@@ -17,6 +17,7 @@ public class Player : MonoBehaviour
 
     private Rigidbody2D rb;
     private BoxCollider2D playerCollider;
+    private Animator animator;
 
     private int directionFacing = 1; //se pa provisório, dependendo de como for feito o animator
     
@@ -34,6 +35,7 @@ public class Player : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         playerCollider = GetComponent<BoxCollider2D>();
+        animator = GetComponent<Animator>();
     }
 
     void Update()
@@ -70,7 +72,6 @@ public class Player : MonoBehaviour
         if(jumpPressed == false) { return; }
         else if (jumpPressed && IsGrounded())
         {
-            print("pulo");
             Jump();
         } 
         else if (jumpPressed && IsTouchingWall())
@@ -98,9 +99,8 @@ public class Player : MonoBehaviour
             rb.velocity = new Vector2(-directionFacing * 4, jumpForce);
             directionFacing = -directionFacing;
         }
-       
 
-        
+
         jumpPressed = false;
         StartCoroutine(WallJumpCooldown());
     }
@@ -113,7 +113,7 @@ public class Player : MonoBehaviour
 
     bool IsGrounded()
     {
-        Vector2 boxCenter = rb.position - new Vector2(0f, 0.15f);
+        Vector2 boxCenter = rb.position - new Vector2(0f, 0.2f);
         Collider2D col = Physics2D.OverlapBox(boxCenter,
                                     playerCollider.bounds.size - new Vector3(0.1f,0,0), 0f, platformLayers);
 
@@ -137,6 +137,9 @@ public class Player : MonoBehaviour
         moveX = Input.GetAxisRaw("Horizontal");
         if (Input.GetButtonDown("Jump")) { jumpPressed = true; }
         if(Input.GetButtonUp("Jump")) { jumpPressed = false; }
+
+        if (IsGrounded() == false) { animator.SetBool("jumping", true); }
+        else { animator.SetBool("jumping", false); }
     }
 
     void HandleShootPressing()
