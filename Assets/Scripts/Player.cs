@@ -67,7 +67,8 @@ public class Player : MonoBehaviour
 
     void CheckJump()
     {
-        if (jumpPressed && IsGrounded())
+        if(jumpPressed == false) { return; }
+        else if (jumpPressed && IsGrounded())
         {
             Jump();
         } 
@@ -79,7 +80,8 @@ public class Player : MonoBehaviour
 
     void Jump()
     {
-        rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        //rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         jumpPressed = false;
     }
 
@@ -89,11 +91,13 @@ public class Player : MonoBehaviour
 
         if (isWallSliding)
         {
-            rb.AddForce(new Vector2(-directionFacing * 5, jumpForce / 1.1f), ForceMode2D.Impulse);
+            //rb.AddForce(new Vector2(-directionFacing * 5, jumpForce / 1.1f), ForceMode2D.Impulse);
+            rb.velocity = new Vector2(-directionFacing * 5, jumpForce);
         } 
         else
         {
-            rb.AddForce(new Vector2(-directionFacing * 5, jumpForce / 1.1f), ForceMode2D.Impulse);
+            //rb.AddForce(new Vector2(-directionFacing * 5, jumpForce / 1.1f), ForceMode2D.Impulse);
+            rb.velocity = new Vector2(-directionFacing * 5, jumpForce);
             directionFacing = -directionFacing;
         }
        
@@ -111,9 +115,11 @@ public class Player : MonoBehaviour
 
     bool IsGrounded()
     {
-        Vector2 boxCenter = rb.position - new Vector2(0f, 0.1f);
+        Vector2 boxCenter = rb.position - new Vector2(0f, 0.15f);
         Collider2D col = Physics2D.OverlapBox(boxCenter,
                                     playerCollider.bounds.size - new Vector3(0.1f,0,0), 0f, platformLayers);
+
+
         return col != null;
     }
 
@@ -193,4 +199,14 @@ public class Player : MonoBehaviour
         }
     }
 
+
+    void OnDrawGizmos()
+    {
+        Debug.DrawRay(transform.position - new Vector3(0,0.1f,0), new Vector2(0, -0.4f), Color.red) ;
+
+        Debug.DrawRay(transform.position, new Vector2(0.3f, 0), Color.yellow);
+
+        Debug.DrawRay(transform.position, new Vector2(-0.3f, 0), Color.yellow);
+
+    }
 }
