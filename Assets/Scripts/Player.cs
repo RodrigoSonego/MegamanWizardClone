@@ -70,6 +70,7 @@ public class Player : MonoBehaviour
         if(jumpPressed == false) { return; }
         else if (jumpPressed && IsGrounded())
         {
+            print("pulo");
             Jump();
         } 
         else if (jumpPressed && IsTouchingWall())
@@ -135,15 +136,15 @@ public class Player : MonoBehaviour
     {
         moveX = Input.GetAxisRaw("Horizontal");
         if (Input.GetButtonDown("Jump")) { jumpPressed = true; }
+        if(Input.GetButtonUp("Jump")) { jumpPressed = false; }
     }
 
     void HandleShootPressing()
     {
-        if (Input.GetButtonDown("Fire1")) { Fire(shootCharge); print("atirou"); }
+        if (Input.GetButtonDown("Fire1")) { Fire(shootCharge); }
 
         if (Input.GetButtonUp("Fire1") && isShootCharged)
-        {
-            print("atirou carregado");
+        {           
             Fire(shootCharge);
             holdTime = 0;
             shootCharge = 0;
@@ -167,8 +168,8 @@ public class Player : MonoBehaviour
         else { holdTime += Time.fixedDeltaTime; }
         
 
-        if (holdTime > 1f && holdTime < 2 ) { shootCharge = 1; isShootCharged = true; print("carregou 1"); }
-        else if (holdTime >= 2f) { shootCharge = 2; print("carregou 2"); }
+        if (holdTime > 1f && holdTime < 2 ) { shootCharge = 1; isShootCharged = true; }
+        else if (holdTime >= 2f) { shootCharge = 2; }
     }
 
     bool IsTouchingWall()
