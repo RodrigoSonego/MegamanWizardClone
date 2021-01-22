@@ -12,6 +12,7 @@ public class Player : MonoBehaviour
     [Space]
     [SerializeField] private GameObject[] shootPrefabs;
     [SerializeField] private Transform shootSpawn;
+    [HideInInspector] private SpriteRenderer spriteRenderer;
     [Space]
     [SerializeField] private LayerMask platformLayers;
 
@@ -19,7 +20,8 @@ public class Player : MonoBehaviour
     private BoxCollider2D playerCollider;
     private Animator animator;
 
-    private int directionFacing = 1; //se pa provisório, dependendo de como for feito o animator
+    private int directionFacing = 1;
+    private bool isFacingRight = true;
     
     private float moveX;
     private bool jumpPressed;
@@ -31,17 +33,21 @@ public class Player : MonoBehaviour
     private bool isWallSliding = false;
     private bool isWallJumping = false;
 
+    private bool isSliding = false;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         playerCollider = GetComponent<BoxCollider2D>();
         animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     void Update()
     {
         HandleMovementInput();
         HandleShootPressing();
+        UpdateAnimations();
     }
 
     void FixedUpdate()
@@ -58,9 +64,7 @@ public class Player : MonoBehaviour
     {
         if (moveX != 0 && isWallJumping == false)
         {
-            float actualSpeed = speed;
-            if(!IsGrounded()) { actualSpeed = speed / 1.3f; }
-            rb.velocity = new Vector2(actualSpeed * moveX, rb.velocity.y);
+            rb.velocity = new Vector2(speed * moveX, rb.velocity.y);
             if(!isWallSliding)directionFacing = (int)moveX;
 
             shootSpawn.localPosition = new Vector3(0.5f * moveX, 0, 0);
@@ -137,9 +141,6 @@ public class Player : MonoBehaviour
         moveX = Input.GetAxisRaw("Horizontal");
         if (Input.GetButtonDown("Jump")) { jumpPressed = true; }
         if(Input.GetButtonUp("Jump")) { jumpPressed = false; }
-
-        if (IsGrounded() == false) { animator.SetBool("jumping", true); }
-        else { animator.SetBool("jumping", false); }
     }
 
     void HandleShootPressing()
@@ -156,6 +157,14 @@ public class Player : MonoBehaviour
         else if (Input.GetButtonUp("Fire1")) { holdTime = 0; }
     }
 
+    void UpdateAnimations()
+    {
+        if(directionFacing == 1 && !isFacingRight) { isFacingRight = true; spriteRenderer.flipX = false; }
+        else if (directionFacing == -1 && isFacingRight) { isFacingRight = false; spriteRenderer.flipX = true; }
+
+        if (IsGrounded() == false) { animator.SetBool("jumping", true); }
+        else { animator.SetBool("jumping", false); }
+    }
 
     void Fire(int shootIndex)
     {
@@ -200,6 +209,12 @@ public class Player : MonoBehaviour
         {
             isWallSliding = false;
         }
+    }
+
+    void Slide()
+    {
+        isSliding = true;
+
     }
 
 
