@@ -223,11 +223,13 @@ public class Player : MonoBehaviour
         if(moveX == directionFacing && IsTouchingWall() && !IsGrounded())
         {
             isWallSliding = true;
+            animator.SetBool("wallSliding", true);
             rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -1.5f, float.MaxValue));
         } 
         else
         {
             isWallSliding = false;
+            animator.SetBool("wallSliding", false);
         }
     }
 
