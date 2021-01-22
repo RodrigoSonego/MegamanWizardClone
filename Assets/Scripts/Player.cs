@@ -10,15 +10,18 @@ public class Player : MonoBehaviour
     [SerializeField] private float jumpForce;
     [SerializeField] private float fallMultiplier;
     [Space]
+    [SerializeField] private float slideTime;
+    [SerializeField] private float slideForce;
+    [Space]
     [SerializeField] private GameObject[] shootPrefabs;
     [SerializeField] private Transform shootSpawn;
-    [HideInInspector] private SpriteRenderer spriteRenderer;
     [Space]
     [SerializeField] private LayerMask platformLayers;
 
     private Rigidbody2D rb;
     private BoxCollider2D playerCollider;
     private Animator animator;
+    private SpriteRenderer spriteRenderer;
 
     private int directionFacing = 1;
     private bool isFacingRight = true;
@@ -34,6 +37,7 @@ public class Player : MonoBehaviour
     private bool isWallJumping = false;
 
     private bool isSliding = false;
+    private bool downPressed = false;
 
     void Start()
     {
@@ -53,6 +57,7 @@ public class Player : MonoBehaviour
     void FixedUpdate()
     {
         CheckWallSlide();
+        CheckSlide();
         CheckJump();
         MovePlayer();
         ApplyGravity();
@@ -62,7 +67,7 @@ public class Player : MonoBehaviour
 
     void MovePlayer()
     {
-        if (moveX != 0 && isWallJumping == false)
+        if (moveX != 0 && isWallJumping == false && isSliding == false)
         {
             rb.velocity = new Vector2(speed * moveX, rb.velocity.y);
             if(!isWallSliding)directionFacing = (int)moveX;
@@ -73,14 +78,18 @@ public class Player : MonoBehaviour
 
     void CheckJump()
     {
-        if(jumpPressed == false) { return; }
-        else if (jumpPressed && IsGrounded())
+        if(jumpPressed == false || isSliding) { return; }
+        else if (IsGrounded())
         {
             Jump();
         } 
-        else if (jumpPressed && IsTouchingWall())
+        else if (IsTouchingWall())
         {
             WallJump();
+        }
+        else if (isSliding) 
+        {
+            SlideJump();
         }
     }
 
@@ -104,9 +113,16 @@ public class Player : MonoBehaviour
             directionFacing = -directionFacing;
         }
 
-
         jumpPressed = false;
         StartCoroutine(WallJumpCooldown());
+    }
+
+    void SlideJump()
+    {
+        rb.velocity = new Vector2(slideForce / 1.2f, jumpForce);
+        jumpPressed = false;
+        isSliding = false;
+        StopCoroutine("SlideTime");
     }
 
     IEnumerator WallJumpCooldown()
@@ -133,14 +149,18 @@ public class Player : MonoBehaviour
         else if (rb.velocity.y > 0 && !Input.GetButton("Jump")) { rb.gravityScale = fallMultiplier; }
         else { rb.gravityScale = 1f; }
 
-        if(moveX == 0f) { rb.velocity = new Vector2(0, rb.velocity.y); }
+        if (moveX == 0f && rb.velocity.y != 0) { rb.velocity = new Vector2(0, rb.velocity.y); }
     }
 
     void HandleMovementInput()
     {
         moveX = Input.GetAxisRaw("Horizontal");
+
         if (Input.GetButtonDown("Jump")) { jumpPressed = true; }
         if(Input.GetButtonUp("Jump")) { jumpPressed = false; }
+
+        if(Input.GetAxisRaw("Vertical") < 0) { downPressed = true; }
+        else { downPressed = false; }
     }
 
     void HandleShootPressing()
@@ -214,8 +234,34 @@ public class Player : MonoBehaviour
     void Slide()
     {
         isSliding = true;
-
+        rb.velocity = new Vector2(slideForce * directionFacing, rb.velocity.y);
+        playerCollider.sharedMaterial.friction = 0f;
+        StartCoroutine(SlideTime(slideTime));
     }
+
+    IEnumerator SlideTime(float time)
+    {
+        yield return new WaitForSeconds(time);
+        playerCollider.sharedMaterial.friction = 10;
+        isSliding = false;
+    }
+
+    void CheckSlide()
+    {
+        if(downPressed && jumpPressed && !isSliding)
+        {
+            Slide();
+        }
+
+        if(isSliding && rb.velocity.x == 0)
+        {
+            isSliding = false;
+            playerCollider.sharedMaterial.friction = 10;
+            StopCoroutine("SlideTime");
+        }
+    }
+ 
+
 
 
     void OnDrawGizmos()
