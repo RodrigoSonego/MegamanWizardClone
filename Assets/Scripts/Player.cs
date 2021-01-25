@@ -6,15 +6,17 @@ using UnityEngine;
 [RequireComponent(typeof(BoxCollider2D))]
 public class Player : MonoBehaviour
 {
+    [Header("Moving")]
     [SerializeField] private float speed;
     [SerializeField] private float jumpForce;
     [SerializeField] private float fallMultiplier;
-    [Space]
+    [Header("Sliding")]
     [SerializeField] private float slideTime;
     [SerializeField] private float slideForce;
-    [Space]
+    [Header("Shooting")]
     [SerializeField] private GameObject[] shootPrefabs;
     [SerializeField] private Transform shootSpawn;
+    [SerializeField] private float shootAnimationTime;
     [Space]
     [SerializeField] private LayerMask platformLayers;
 
@@ -32,6 +34,7 @@ public class Player : MonoBehaviour
 
     private bool isShootCharged = false;
     private int shootCharge = 0;
+    private float shootTimer;
 
     private bool isWallSliding = false;
     private bool isWallJumping = false;
@@ -68,12 +71,10 @@ public class Player : MonoBehaviour
     void MovePlayer()
     {
         if (moveX != 0 && isWallJumping == false && isSliding == false)
-        {
+        {           
             rb.velocity = new Vector2(speed * moveX, rb.velocity.y);
             if(!isWallSliding)directionFacing = (int)moveX;
-
-            shootSpawn.localPosition = new Vector3(0.5f * moveX, 0, 0);
-        }
+        }      
     }
 
     void CheckJump()
@@ -165,7 +166,12 @@ public class Player : MonoBehaviour
 
     void HandleShootPressing()
     {
-        if (Input.GetButtonDown("Fire1")) { Fire(shootCharge); }
+        if (Input.GetButtonDown("Fire1")) 
+        {   Fire(shootCharge);
+            animator.SetBool("shooting", true);
+            shootTimer = 0;
+            StopCoroutine("StopShootingAnimation");
+        }
 
         if (Input.GetButtonUp("Fire1") && isShootCharged)
         {           
@@ -173,17 +179,38 @@ public class Player : MonoBehaviour
             holdTime = 0;
             shootCharge = 0;
             isShootCharged = false;
+            StartCoroutine("StopShootingAnimation");
         }
-        else if (Input.GetButtonUp("Fire1")) { holdTime = 0; }
+        else if (Input.GetButtonUp("Fire1")) 
+        { 
+            holdTime = 0;
+            StartCoroutine("StopShootingAnimation");
+        }
+    }
+
+    IEnumerator StopShootingAnimation()
+    {
+        yield return new WaitForSeconds(shootAnimationTime);
+        animator.SetBool("shooting", false);
     }
 
     void UpdateAnimations()
     {
-        if(directionFacing == 1 && !isFacingRight) { isFacingRight = true; spriteRenderer.flipX = false; }
-        else if (directionFacing == -1 && isFacingRight) { isFacingRight = false; spriteRenderer.flipX = true; }
+        if(directionFacing == 1 && !isFacingRight) { isFacingRight = true; spriteRenderer.flipX = false; FlipShootSpawn(); }
+        else if (directionFacing == -1 && isFacingRight) { isFacingRight = false; spriteRenderer.flipX = true; FlipShootSpawn(); }        
 
         if (IsGrounded() == false) { animator.SetBool("jumping", true); }
         else { animator.SetBool("jumping", false); }
+
+        if(moveX != 0) { animator.SetBool("moving", true); }
+        else { animator.SetBool("moving", false); }
+
+        if (shootTimer >= shootAnimationTime) { animator.SetBool("shooting", false); }
+    }
+
+    void FlipShootSpawn()
+    {
+        shootSpawn.localPosition = new Vector3(-shootSpawn.localPosition.x, shootSpawn.localPosition.y, 0);
     }
 
     void Fire(int shootIndex)
@@ -194,10 +221,11 @@ public class Player : MonoBehaviour
     }
 
 
+
     void CheckChargeShot()
     {
         if (Input.GetButton("Fire1") == false) { return; }
-        else { holdTime += Time.fixedDeltaTime; }
+        else { holdTime += Time.fixedDeltaTime;}
         
 
         if (holdTime > 1f && holdTime < 2 ) { shootCharge = 1; isShootCharged = true; }
