@@ -88,10 +88,10 @@ public class Player : MonoBehaviour
         {
             WallJump();
         }
-        else if (isSliding) 
-        {
-            SlideJump();
-        }
+        //else if (isSliding) 
+        //{
+        //    SlideJump();
+        //}
     }
 
     void Jump()
@@ -206,6 +206,7 @@ public class Player : MonoBehaviour
         else { animator.SetBool("moving", false); }
 
         if (shootTimer >= shootAnimationTime) { animator.SetBool("shooting", false); }
+        else if( isWallSliding) { StopCoroutine("StopShootingAnimation"); animator.SetBool("shooting", false); }
     }
 
     void FlipShootSpawn()
