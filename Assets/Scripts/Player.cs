@@ -42,6 +42,8 @@ public class Player : MonoBehaviour
     private bool isSliding = false;
     private bool downPressed = false;
 
+    private Coroutine shootingAnimation;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -170,7 +172,7 @@ public class Player : MonoBehaviour
         {   Fire(shootCharge);
             animator.SetBool("shooting", true);
             shootTimer = 0;
-            StopCoroutine("StopShootingAnimation");
+            if (shootingAnimation != null) { StopCoroutine(shootingAnimation); }
         }
 
         if (Input.GetButtonUp("Fire1") && isShootCharged)
@@ -179,12 +181,12 @@ public class Player : MonoBehaviour
             holdTime = 0;
             shootCharge = 0;
             isShootCharged = false;
-            StartCoroutine("StopShootingAnimation");
+            shootingAnimation = StartCoroutine(StopShootingAnimation());
         }
         else if (Input.GetButtonUp("Fire1")) 
         { 
             holdTime = 0;
-            StartCoroutine("StopShootingAnimation");
+            shootingAnimation = StartCoroutine(StopShootingAnimation());
         }
     }
 
@@ -265,16 +267,18 @@ public class Player : MonoBehaviour
     void Slide()
     {
         isSliding = true;
+        animator.SetBool("sliding", true);
         rb.velocity = new Vector2(slideForce * directionFacing, rb.velocity.y);
         playerCollider.sharedMaterial.friction = 0f;
         StartCoroutine(SlideTime(slideTime));
     }
 
     IEnumerator SlideTime(float time)
-    {
+    {       
         yield return new WaitForSeconds(time);
         playerCollider.sharedMaterial.friction = 10;
         isSliding = false;
+        animator.SetBool("sliding", false);
     }
 
     void CheckSlide()
@@ -292,8 +296,6 @@ public class Player : MonoBehaviour
         }
     }
  
-
-
 
     void OnDrawGizmos()
     {
