@@ -13,9 +13,10 @@ GameObject:
   - component: {fileID: 2674102421111532566}
   - component: {fileID: 3617845696673972796}
   - component: {fileID: 1700213924}
+  - component: {fileID: 2433128699420382210}
   m_Layer: 9
   m_Name: MediumProjectile
-  m_TagString: Untagged
+  m_TagString: Projectile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -103,7 +104,7 @@ Rigidbody2D:
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 1
+  m_CollisionDetection: 0
   m_Constraints: 4
 --- !u!61 &3617845696673972796
 BoxCollider2D:
@@ -150,3 +151,16 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &2433128699420382210
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1677422034841707196}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4521da2a909d14149ae59bbbbadbbbb8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 25

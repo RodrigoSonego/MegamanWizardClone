@@ -3,7 +3,7 @@ using UnityEngine;
 using Pathfinding;
 
 [RequireComponent(typeof(Seeker))]
-public class FlyingEnemy : MonoBehaviour
+public class FlyingEnemy : Enemy
 {
     [SerializeField] private Transform player;
     [SerializeField] private GameObject projectilePrefab;
