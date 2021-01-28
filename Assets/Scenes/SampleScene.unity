@@ -624,7 +624,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1019964369
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1417,35 +1417,40 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 661701034571824315, guid: 4b5c4ac122050664482046e372015f75,
+    - target: {fileID: 661701034571824318, guid: 4b5c4ac122050664482046e372015f75,
         type: 3}
-      propertyPath: m_Color.b
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 661701034571824315, guid: 4b5c4ac122050664482046e372015f75,
-        type: 3}
-      propertyPath: m_Color.g
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 661701034571824315, guid: 4b5c4ac122050664482046e372015f75,
-        type: 3}
-      propertyPath: m_Color.r
-      value: 1
+      propertyPath: health
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 661701034571824318, guid: 4b5c4ac122050664482046e372015f75,
         type: 3}
-      propertyPath: slideTime
-      value: 0.4
-      objectReference: {fileID: 0}
-    - target: {fileID: 661701034571824318, guid: 4b5c4ac122050664482046e372015f75,
-        type: 3}
-      propertyPath: slideForce
-      value: 10
+      propertyPath: invulnerabilityTime
+      value: 1.3
       objectReference: {fileID: 0}
     - target: {fileID: 661701034571824319, guid: 4b5c4ac122050664482046e372015f75,
         type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 661701034908030161, guid: 4b5c4ac122050664482046e372015f75,
+        type: 3}
+      propertyPath: m_Size.x
+      value: 0.60144275
+      objectReference: {fileID: 0}
+    - target: {fileID: 661701034908030161, guid: 4b5c4ac122050664482046e372015f75,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 0.79217887
+      objectReference: {fileID: 0}
+    - target: {fileID: 661701034908030161, guid: 4b5c4ac122050664482046e372015f75,
+        type: 3}
+      propertyPath: m_Offset.x
+      value: 0.026923537
+      objectReference: {fileID: 0}
+    - target: {fileID: 661701034908030161, guid: 4b5c4ac122050664482046e372015f75,
+        type: 3}
+      propertyPath: m_Offset.y
+      value: -0.103910565
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4b5c4ac122050664482046e372015f75, type: 3}

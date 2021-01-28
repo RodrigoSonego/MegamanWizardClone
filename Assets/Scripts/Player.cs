@@ -6,6 +6,8 @@ using UnityEngine;
 [RequireComponent(typeof(BoxCollider2D))]
 public class Player : MonoBehaviour
 {
+    [SerializeField] private float health;
+    [SerializeField] private float invulnerabilityTime;
     [Header("Moving")]
     [SerializeField] private float speed;
     [SerializeField] private float jumpForce;
@@ -24,6 +26,8 @@ public class Player : MonoBehaviour
     private BoxCollider2D playerCollider;
     private Animator animator;
     private SpriteRenderer spriteRenderer;
+
+    private bool canTakeDamage = true;
 
     private int directionFacing = 1;
     private bool isFacingRight = true;
@@ -295,7 +299,37 @@ public class Player : MonoBehaviour
             StopCoroutine("SlideTime");
         }
     }
- 
+
+    public void TakeDamage(int damage)
+    {
+        if(!canTakeDamage) { return; }
+
+        health -= damage;
+        print(health);
+        ApplyDamageRecoil();        
+        StartCoroutine(InvulnerabilityTime());
+    }
+
+    IEnumerator InvulnerabilityTime()
+    {
+        animator.SetBool("invulnerable",true);
+        canTakeDamage = false;
+        
+        yield return new WaitForSeconds(invulnerabilityTime);
+
+        isSliding = false;
+        playerCollider.sharedMaterial.friction = 10f;
+        animator.SetBool("invulnerable", false);
+        canTakeDamage = true;
+
+    }
+
+    void ApplyDamageRecoil()
+    {
+        isSliding = true;
+        playerCollider.sharedMaterial.friction = 0f;
+        rb.AddForce(Vector2.right * -directionFacing);
+    }
 
     void OnDrawGizmos()
     {
