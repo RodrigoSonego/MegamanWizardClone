@@ -48,12 +48,17 @@ public class Player : MonoBehaviour
 
     private Coroutine shootingAnimation;
 
+    private int jumpingId;
+    private int wallSlideId;
+    private int movingId;
+    private int shootingId;
+    private int slidingId;
+    private int invulnerableId;
+
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
-        playerCollider = GetComponent<BoxCollider2D>();
-        animator = GetComponent<Animator>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        GetComponents();
+        GetAnimatorIDs();
     }
 
     void Update()
@@ -205,14 +210,14 @@ public class Player : MonoBehaviour
         if(directionFacing == 1 && !isFacingRight) { isFacingRight = true; spriteRenderer.flipX = false; FlipShootSpawn(); }
         else if (directionFacing == -1 && isFacingRight) { isFacingRight = false; spriteRenderer.flipX = true; FlipShootSpawn(); }        
 
-        if (IsGrounded() == false) { animator.SetBool("jumping", true); }
-        else { animator.SetBool("jumping", false); }
+        if (IsGrounded() == false) { animator.SetBool(jumpingId, true); }
+        else { animator.SetBool(jumpingId, false); }
 
-        if(moveX != 0) { animator.SetBool("moving", true); }
-        else { animator.SetBool("moving", false); }
+        if(moveX != 0) { animator.SetBool(movingId, true); }
+        else { animator.SetBool(movingId, false); }
 
-        if (shootTimer >= shootAnimationTime) { animator.SetBool("shooting", false); }
-        else if( isWallSliding) { StopCoroutine("StopShootingAnimation"); animator.SetBool("shooting", false); }
+        if (shootTimer >= shootAnimationTime) { animator.SetBool(shootingId, false); }
+        else if( isWallSliding) { StopCoroutine("StopShootingAnimation"); animator.SetBool(shootingId, false); }
     }
 
     void FlipShootSpawn()
@@ -258,20 +263,20 @@ public class Player : MonoBehaviour
         if(moveX == directionFacing && IsTouchingWall() && !IsGrounded())
         {
             isWallSliding = true;
-            animator.SetBool("wallSliding", true);
+            animator.SetBool(wallSlideId, true);
             rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -1.5f, float.MaxValue));
         } 
         else
         {
             isWallSliding = false;
-            animator.SetBool("wallSliding", false);
+            animator.SetBool(wallSlideId, false);
         }
     }
 
     void Slide()
     {
         isSliding = true;
-        animator.SetBool("sliding", true);
+        animator.SetBool(slidingId, true);
         rb.velocity = new Vector2(slideForce * directionFacing, rb.velocity.y);
         playerCollider.sharedMaterial.friction = 0f;
         StartCoroutine(SlideTime(slideTime));
@@ -282,7 +287,7 @@ public class Player : MonoBehaviour
         yield return new WaitForSeconds(time);
         playerCollider.sharedMaterial.friction = 10;
         isSliding = false;
-        animator.SetBool("sliding", false);
+        animator.SetBool(slidingId, false);
     }
 
     void CheckSlide()
@@ -306,20 +311,20 @@ public class Player : MonoBehaviour
 
         health -= damage;
         print(health);
-        ApplyDamageRecoil();        
+        //ApplyDamageRecoil();        
         StartCoroutine(InvulnerabilityTime());
     }
 
     IEnumerator InvulnerabilityTime()
     {
-        animator.SetBool("invulnerable",true);
+        animator.SetBool(invulnerableId,true);
         canTakeDamage = false;
         
         yield return new WaitForSeconds(invulnerabilityTime);
 
         isSliding = false;
         playerCollider.sharedMaterial.friction = 10f;
-        animator.SetBool("invulnerable", false);
+        animator.SetBool(invulnerableId, false);
         canTakeDamage = true;
 
     }
@@ -328,8 +333,28 @@ public class Player : MonoBehaviour
     {
         isSliding = true;
         playerCollider.sharedMaterial.friction = 0f;
-        rb.AddForce(Vector2.right * -directionFacing);
+        rb.AddForce(Vector2.right * -directionFacing, ForceMode2D.Impulse);
     }
+
+
+    void GetComponents()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        playerCollider = GetComponent<BoxCollider2D>();
+        animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+    }
+
+    void GetAnimatorIDs()
+    {
+        jumpingId = Animator.StringToHash("jumping");
+        wallSlideId = Animator.StringToHash("wallSliding");
+        movingId = Animator.StringToHash("moving");
+        shootingId = Animator.StringToHash("shooting");
+        slidingId = Animator.StringToHash("sliding");
+        invulnerableId = Animator.StringToHash("invulnerable");
+    }
+
 
     void OnDrawGizmos()
     {
