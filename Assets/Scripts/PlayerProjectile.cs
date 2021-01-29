@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerProjectile : MonoBehaviour
 {
     [SerializeField] private int damage;
+    [SerializeField] private bool destroyOnCollision;
 
     public int Damage
     {
@@ -14,4 +15,9 @@ public class PlayerProjectile : MonoBehaviour
         }
     }
 
+    public void CheckDestroyOnCollision()
+    {
+        if (!destroyOnCollision) { return; }
+        else { Destroy(gameObject); }
+    }
 }

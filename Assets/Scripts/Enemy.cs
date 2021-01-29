@@ -49,7 +49,9 @@ public class Enemy : MonoBehaviour
         } 
         else if (collisionWithBullet)
         {
-            TakeDamage(collision.GetComponent<PlayerProjectile>().Damage);
+            PlayerProjectile projectile = collision.GetComponent<PlayerProjectile>();
+            TakeDamage(projectile.Damage);
+            projectile.CheckDestroyOnCollision();
         }
     }
 

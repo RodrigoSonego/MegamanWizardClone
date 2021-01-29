@@ -310,8 +310,7 @@ public class Player : MonoBehaviour
         if(!canTakeDamage) { return; }
 
         health -= damage;
-        print(health);
-        //ApplyDamageRecoil();        
+        print(health);        
         StartCoroutine(InvulnerabilityTime());
     }
 
@@ -327,13 +326,6 @@ public class Player : MonoBehaviour
         animator.SetBool(invulnerableId, false);
         canTakeDamage = true;
 
-    }
-
-    void ApplyDamageRecoil()
-    {
-        isSliding = true;
-        playerCollider.sharedMaterial.friction = 0f;
-        rb.AddForce(Vector2.right * -directionFacing, ForceMode2D.Impulse);
     }
 
 
