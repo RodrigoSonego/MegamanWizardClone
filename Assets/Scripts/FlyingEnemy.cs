@@ -27,7 +27,6 @@ public class FlyingEnemy : Enemy
     private bool canAttack = true;
 
     Coroutine updatePathCoroutine = null;
-    Coroutine shootCoroutine = null;
 
     void Start()
     {
@@ -63,9 +62,9 @@ public class FlyingEnemy : Enemy
 
         hasDetectedPlayer = true;
 
-        if(distanceToPlayer < attackRadius)
+        if(distanceToPlayer < attackRadius && canAttack)
         {
-            Attack();
+            StartCoroutine(ShootAnimation());
         }
 
     }
@@ -98,8 +97,6 @@ public class FlyingEnemy : Enemy
 
     void Attack()
     {
-        if(canAttack == false) { return; }
-
         Vector2 direction = (Vector2)player.position - rb.position;
         Vector2 force = direction.normalized * projectileSpeed;
         float fireballRotation = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
@@ -107,16 +104,23 @@ public class FlyingEnemy : Enemy
         GameObject fireball = Instantiate(projectilePrefab, rb.position, Quaternion.Euler(0, 0, fireballRotation));
         Destroy(fireball, 5f);
         fireball.GetComponent<Rigidbody2D>().velocity = force;
-
-        shootCoroutine = StartCoroutine(ShootCooldown());
     }
 
-    IEnumerator ShootCooldown()
+    IEnumerator ShootAnimation()
     {
         canAttack = false;
+        animator.SetBool("attacking", true);
+        yield return new WaitForSeconds(0.8f);
+        Attack();
+
+        yield return new WaitForSeconds(.05f);
+        animator.SetBool("attacking", false);
+
         yield return new WaitForSeconds(shootCooldown);
         canAttack = true;
     }
+
+
 
     IEnumerator UpdatePathTime()
     {

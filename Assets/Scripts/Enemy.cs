@@ -8,8 +8,8 @@ public class Enemy : MonoBehaviour
 {
     [SerializeField] private int health;
     [SerializeField] private int damage;
-    [SerializeField] private Animator animator;
-    [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] protected Animator animator;
+    [SerializeField] protected SpriteRenderer spriteRenderer;
 
     public void TakeDamage(int damage)
     {
